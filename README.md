@@ -1,4 +1,7 @@
-EggTimer - Final Code 
+# Advanced Android in Kotlin 01.2: Android Firebase Cloud Messaging
+
+
+https://developer.android.com/codelabs/advanced-android-kotlin-training-notifications-fcm#0
 ============================================================================
 
 Solution code for Advanced Android with Kotlin Codelab 
