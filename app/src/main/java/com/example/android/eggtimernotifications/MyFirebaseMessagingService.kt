@@ -26,7 +26,9 @@ import com.google.firebase.messaging.RemoteMessage
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     /**
-     * Called when message is received.
+     * In order to handle data messages, you need to handle the data payload in the onMessageReceived() function
+     * of MyFirebaseMessagingService. The payload is stored in the data property of the remoteMessage object.
+     * Both the remoteMessage object and the data property can be null.
      *
      * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
      */
@@ -35,20 +37,32 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.d(TAG, "From: ${remoteMessage?.from}")
 
-        // TODO Step 3.5 check messages for data
-        // Check if message contains a data payload.
+      remoteMessage?.data?.let {
+          Log.d(TAG, "MESSAGE Data payload : " + remoteMessage.data)
+      }
 
-
-        // TODO Step 3.6 check messages for notification and call sendNotification
-        // Check if message contains a notification payload.
-
+        remoteMessage?.notification?.let {
+            Log.d(TAG, "Message Notification Body: ${it.body}")
+            sendNotification(it.body as String)
+        }
     }
-    // [END receive_message]
 
-    //TODO Step 3.2 log registration token
-    // [START on_new_token]
+    /**
+     * onNewToken()—Called automatically if your service is registered in the Android manifest.
+     * This function is called when you first run your app and every time Firebase issues a new token for your app.
+     * A token is an access key to your Firebase backend project. It's generated for your specific client device.
+     * With this token, Firebase knows which client the backend should send messages to. Firebase also knows if this
+     * client is valid and has access to this Firebase project.
+     */
+    override fun onNewToken(token: String?) {
+        Log.d(TAG, "Refreshed token: $token")
 
-    // [END on_new_token]
+        // If you want to send messages to this application instance or
+        // manage this apps subscriptions on the server side, send the
+        // Instance ID token to your app server.
+        sendRegistrationToServer(token)
+    }
+
 
     /**
      * Persist token to third-party (your app) servers.

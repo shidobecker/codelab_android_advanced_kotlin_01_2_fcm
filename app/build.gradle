@@ -40,6 +40,8 @@ android {
     dataBinding {
         enabled = true
     }
+
+
 }
 
 dependencies {
@@ -62,3 +64,5 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:19.0.1'
     implementation 'android.arch.work:work-runtime:1.0.1'
 }
+
+apply plugin: 'com.google.gms.google-services'  // Google Play services Gradle plugin

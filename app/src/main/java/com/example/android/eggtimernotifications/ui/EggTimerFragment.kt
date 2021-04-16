@@ -50,30 +50,30 @@ class EggTimerFragment : Fragment() {
         binding.eggTimerViewModel = viewModel
         binding.lifecycleOwner = this.viewLifecycleOwner
 
-        // TODO: Step 1.7 call create channel
         createChannel(
             getString(R.string.egg_notification_channel_id),
             getString(R.string.egg_notification_channel_name)
         )
 
-        // TODO: Step 3.1 create a new channel for FCM
+        createChannel(
+            getString(R.string.breakfast_notification_channel_id),
+            getString(R.string.breakfast_notification_channel_name)
+        )
 
-        // TODO: Step 3.4 call subscribe topics on start
+
+        subscribeTopic()
 
         return binding.root
     }
 
     private fun createChannel(channelId: String, channelName: String) {
-        // TODO: Step 1.6 START create a channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        	// Create channel to show notifications.
+            // Create channel to show notifications.
             val notificationChannel = NotificationChannel(
                 channelId,
                 channelName,
-                // TODO: Step 2.4 change importance
                 NotificationManager.IMPORTANCE_HIGH
             )
-			    // TODO: Step 2.6 disable badges for this channel
                 .apply {
                     setShowBadge(false)
                 }
@@ -81,7 +81,8 @@ class EggTimerFragment : Fragment() {
             notificationChannel.enableLights(true)
             notificationChannel.lightColor = Color.RED
             notificationChannel.enableVibration(true)
-            notificationChannel.description = getString(R.string.breakfast_notification_channel_description)
+            notificationChannel.description =
+                getString(R.string.breakfast_notification_channel_description)
 
             val notificationManager = requireActivity().getSystemService(
                 NotificationManager::class.java
@@ -89,10 +90,41 @@ class EggTimerFragment : Fragment() {
             notificationManager.createNotificationChannel(notificationChannel)
 
         }
-        // TODO: Step 1.6 END create channel
     }
 
-    // TODO: Step 3.3 subscribe to breakfast topic
+    /**
+     * A messaging app can be a good example for the Publish/Subscribe model. Imagine that an app checks for
+     * new messages every 10 seconds. This will not only drain your phone battery, but will also use unnecessary
+     * network resources, and will create an unnecessary load on your app's server. Instead, a client device can
+     * subscribe and be notified when there are new messages delivered through your app.
+
+    Topics allow you to send a message to multiple devices that have opted in to that particular topic.
+    For clients, topics are specific data sources which the client is interested in. For the server, topics
+    are groups of devices which have opted in to receive updates on a specific data source. Topics can be used
+    to present categories of notifications, such as news, weather forecasts, and sports results. For this part
+    of the codelab, you will create a "breakfast" topic to remind the interested app users to eat eggs with their
+    breakfast.
+
+    To subscribe to a topic, the client app calls the Firebase Cloud Messaging subscribeToTopic(``) function with
+    the topic name breakfast. This call can have two outcomes. If the caller succeeds, the OnCompleteListener
+    callback will be called with the subscribed message. If the client fails to subscribe, the callback will
+    receive an error message instead.
+
+    In your app, you will automatically subscribe your users to the breakfast topic. In most production apps,
+    however, it's better to give users control over which topics to subscribe to.
+     */
+
+    private fun subscribeTopic() {
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC).addOnCompleteListener { task ->
+            val msg = if (task.isSuccessful.not()) {
+                getString(R.string.message_subscribe_failed)
+            } else {
+                getString(R.string.message_subscribed)
+            }
+
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+        }
+    }
 
     companion object {
         fun newInstance() = EggTimerFragment()
